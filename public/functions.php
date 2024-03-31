@@ -1,5 +1,7 @@
 <?php
-    $conn = mysqli_connect("localhost", "root", "", "project-inventory");
+    session_start();
+
+    $conn = mysqli_connect("localhost", "root", "", "db_inventory");
 
     function query($query){
         global $conn;
@@ -55,7 +57,7 @@
         }
 
         $hashed_username = hash('sha256', $credentials["username"]);
-        $_SESSION["login"] = true; 
+        $_SESSION["login"] = $hashed_username; 
 
         if($rememberMe){
             setcookie("id", $credentials["id"], time() + (3600 * 24 * 7), "/");
@@ -134,8 +136,65 @@
                 return false;
             }
 
-            return true;
+            return [
+                "user_data" => $credentials,
+                "status" => true
+            ];
         }
+
+        return [
+            "user_data" => null,
+            "status" => false
+        ];
+    }
+
+    function getDashboardStats(){
+        global $conn;
+        $total_alat = mysqli_num_rows(mysqli_query($conn, "SELECT * FROM alat_sekolah;"));
+        $jumlah_kategori = mysqli_num_rows(mysqli_query($conn, "SELECT * FROM kategori;"));
+        
+        // kode tambahan buat data dashboard 
+        $bulan_terkini = date("m");
+        $alat_sekolah = query("SELECT * FROM alat_sekolah;");
+        $counter_masuk = 0;
+        $counter_keluar = 0;
+
+        foreach($alat_sekolah as $alat){
+            $bulan_tambah_alat = explode("-",explode(" ", $alat["tgl_ditambahkan"])[0])[1];
+            $bulan_penukaran_alat = explode("-",explode(" ", $alat["tgl_ditambahkan"])[0])[1];
+
+            if($alat["tgl_ditambahkan"] != $alat["tgl_dimodifikasi"] &&
+                $bulan_penukaran_alat == $bulan_tambah_alat){
+                    $counter_keluar++;
+            }
+
+            if($bulan_tambah_alat == $bulan_terkini){
+                $counter_masuk++;
+            }
+        }
+
+        return [
+            "total_alat" => $total_alat,
+            "total_kategori" => $jumlah_kategori,
+            "barang_masuk" => $counter_masuk,
+            "barang_keluar" => $counter_keluar,
+        ];
+
+    }
+
+    function getUserDataBySession(){
+        $hashed_username = $_SESSION["login"];
+
+        $users = query("SELECT * FROM admin;");
+        $user_data = null;
+
+        foreach($users as $user){
+            if($hashed_username == hash('sha256',$user["username"])){
+                $user_data = $user;
+            }
+        }
+
+        return $user_data;
     }
 
 ?>

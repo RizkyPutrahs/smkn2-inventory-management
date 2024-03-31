@@ -1,16 +1,17 @@
 <?php
-    session_start();
-
     require 'functions.php';
 
-    if(checkCookie()){
+    $isCookie = checkCookie();
+    if($isCookie["status"]){
+        $user_data = $isCookie["user_data"];
         $_SESSION["login"] = true;
-    }
-
-    if(!isset($_SESSION["login"])){
+    }else if(!isset($_SESSION["login"])){
         header("Location: intro.php");
         exit;
     }
+
+    $user_data = getUserDataBySession();
+    $dashboardStats = getDashboardStats();
 
 ?>
 
@@ -116,12 +117,12 @@
             <div class="header flex flex-row flex-wrap gap-3 justify-between">
                 <div class="header-text">
                     <p class="font-normal text-lg text-slate-400">DASHBOARD</p>
-                    <h1 class="font-normal text-3xl text-slate-700">Halo <span class="font-bold text-slate-900">Bima Ananta</span>✋</h1>
+                    <h1 class="font-normal text-3xl text-slate-700">Halo <span class="font-bold text-slate-900"><?= $user_data["nama"] ?></span>✋</h1>
                 </div>
                 <div class="profile flex flex-row items-center gap-4">
                     <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" alt="" class="w-[50px] h-[50px] rounded-full">
                     <div class="text flex flex-col">
-                        <h3 class="font-semibold text-base">Bima Ananta</h3>
+                        <h3 class="font-semibold text-base"><?= $user_data["nama"] ?></h3>
                         <a href="#" class="text-xs">View Profile</a>
                     </div>
                 </div>
@@ -130,28 +131,28 @@
                 <div class="dashboard-info total-barang flex-1 min-w-[200px] h-[150px] bg-blue-500 rounded flex flex-row justify-end items-center p-5 gap-5 shadow-lg relative overflow-hidden">
                     <i class="bi bi-box-seam dashboard text-8xl text-slate-900 opacity-25 absolute -bottom-3 left-0 block -rotate-6 scale-150"></i>
                     <div class="text z-10">
-                        <h1 class="text-white font-semibold text-3xl">69</h1>
+                        <h1 class="text-white font-semibold text-3xl"><?= $dashboardStats["total_alat"] ?></h1>
                         <h1 class="text-white font-semibold text-sm">Total Barang</h1>
                     </div>
                 </div>
                 <div class="dashboard-info kategori-barang flex-1 min-w-[200px] h-[150px] bg-yellow-600 rounded flex flex-row justify-end items-center p-5 gap-5 shadow-lg relative overflow-hidden">
                     <i class="bi bi-folder dashboard text-8xl text-slate-900 opacity-25 absolute -bottom-1 left-0 block -rotate-6 scale-150"></i>
                     <div class="text z-10">
-                        <h1 class="text-white font-semibold text-3xl">5</h1>
+                        <h1 class="text-white font-semibold text-3xl"><?= $dashboardStats["total_kategori"] ?></h1>
                         <h1 class="text-white font-semibold text-sm">Kategori Barang</h1>
                     </div>
                 </div>
                 <div class="dashboard-info barang-masuk flex-1 min-w-[200px] h-[150px] bg-green-600 rounded flex flex-row justify-end items-center p-5 gap-5 shadow-lg relative overflow-hidden">
                     <i class="bi bi-bag-plus dashboard text-8xl text-slate-900 opacity-25 absolute -bottom-1 left-0 block -rotate-6 scale-150"></i>
                     <div class="text z-10">
-                        <h1 class="text-white font-semibold text-3xl">12</h1>
+                        <h1 class="text-white font-semibold text-3xl"><?= $dashboardStats["barang_masuk"] ?></h1>
                         <h1 class="text-white font-semibold text-sm">Barang Masuk</h1>
                     </div>
                 </div>
                 <div class="dashboard-info barang-keluar flex-1 min-w-[200px] h-[150px] bg-red-500 rounded flex flex-row justify-end items-center p-5 gap-5 shadow-lg relative overflow-hidden">
                     <i class="bi bi-clipboard2-minus dashboard text-8xl text-slate-900 opacity-25 absolute -bottom-1 left-0 block -rotate-6 scale-150"></i>
                     <div class="text z-10">
-                        <h1 class="text-white font-semibold text-3xl">11</h1>
+                        <h1 class="text-white font-semibold text-3xl"><?= $dashboardStats["barang_keluar"] ?></h1>
                         <h1 class="text-white font-semibold text-sm">Barang Keluar</h1>
                     </div>
                 </div>
