@@ -14,6 +14,14 @@
         return $rows;
     }
 
+    // cari
+    function cari($key) {
+        global $conn;
+        $query = "SELECT * FROM kategori WHERE
+                    nama LIKE '%$key%'";
+        return query($query);
+    }
+
     function login($data, $table){
         global $conn;
 

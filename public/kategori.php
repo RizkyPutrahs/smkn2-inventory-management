@@ -1,3 +1,27 @@
+<?php
+// session
+session_start();
+
+require 'functions.php';
+
+if(checkCookie()){
+    $_SESSION["login"] = true;
+}
+
+if(!isset($_SESSION["login"])){
+    header("Location: intro.php");
+    exit;
+}
+
+// tabel
+$kategori = query("SELECT * FROM kategori");
+
+// jika combol search di tekan
+if(isset($_POST["cari"])) {
+    $kategori = cari($_POST["key"]);
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -209,14 +233,17 @@
                     </select>
                 </div>
                 <div class="search-part flex flex-row items-center w-full rounded-md shadow-md overflow-hidden">
-                    <div class="search-column flex-1 flex flex-row gap-3 border border-slate-300 rounded-l-md p-2 bg-white overflow-hidden">
-                        <i class="bi bi-search text-base"></i>
-                        <input type="text" name="search" id="search" class="outline-none text-sm" placeholder="Enter Search">
-                    </div>
-                    <button class="w-[80px] h-[40px] rounded-r-md text-white py-2 bg-blue-700 "><i class="bi bi-search"></i></button>
+                    <form method="POST" action="kategori.php" class="search-part flex flex-row items-center w-full rounded-md shadow-md overflow-hidden">
+                        <div class="search-column flex-1 flex flex-row gap-3 border border-slate-300 rounded-l-md p-2 bg-white overflow-hidden">
+                            <i class="bi bi-search text-base"></i>
+                            <input type="text" name="key" id="search" class="outline-none text-sm" placeholder="Enter Search">
+                        </div>
+                            <button type="submit" name="cari" class="w-[80px] h-[40px] rounded-r-md text-white py-2 bg-blue-700 "><i class="bi bi-search"></i></button>
+                    </form>
+
                 </div>
                 <div class="action w-full flex flex-row justify-end gap-2">
-                    <a href="inventory.html" class="px-3 py-2 text-white rounded-md bg-green-600 text-sm shadow-md flex items-center gap-1"><i class="bi bi-eye"></i> Lihat Alat</a>
+                    <a href="inventory.php" class="px-3 py-2 text-white rounded-md bg-green-600 text-sm shadow-md flex items-center gap-1"><i class="bi bi-eye"></i> Lihat Alat</a>
                     <button onclick="modalToggle()" class="px-3 py-2 text-white rounded-md bg-yellow-600 text-sm shadow-md"><i class="bi bi-exclamation-circle"></i> Informasi</button>
                 </div>
             </div>
@@ -228,23 +255,19 @@
                         <th>Aksi</th>
                     </tr>
                 </thead>
+                <?php $i = 1; ?>
+                <?php foreach ($kategori as $row) : ?>
                 <tbody>
                     <tr>
-                        <td>1</td>
-                        <td>Fasilitas Sekolah</td>
+                        <td><?= $i;?></td>
+                        <td><?= $row["nama"]?></td>
                         <td class="flex flex-row gap-2">
-                            <button class="px-3 py-2 text-white rounded-md bg-green-600">Detail</button>
+                            <a href="inventory.php?id=<?= $row["id"]; ?>" class="px-3 py-2 text-white rounded-md bg-green-600">Detail</a>
                             <button class="px-3 py-2 text-white rounded-md bg-red-600">Hapus</button>
                         </td>
                     </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Fasilitas</td>
-                        <td class="flex flex-row gap-2">
-                            <button class="px-3 py-2 text-white rounded-md bg-green-600">Detail</button>
-                            <button class="px-3 py-2 text-white rounded-md bg-red-600">Hapus</button>
-                        </td>
-                    </tr>
+                    <?php $i++; ?>
+                    <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
